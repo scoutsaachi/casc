@@ -6,17 +6,13 @@ import os
 
 CLUSTER_NUMBER = 10
 
-# def dataset2():
-# 	beta = 70
-# 	inputName = "synthetic/dataset2/input.csv"
-# 	outputName = "synthetic/dataset2/old_assign.out"
-# 	number_of_clusters = 10
-# 	#runNonMotifTICC(inputName, outputName, number_of_clusters, beta, outputName)
-# 	runHyperParameterTests(inputName, "synthetic/dataset2/new_assign", number_of_clusters,beta,outputName)
-
+'''
+Run without motifs: python3 synthetic.py 0 ordered_synthetic_allperturbs/epsilon_value
+Run with motifs: python3 synthetic.py 1 ordered_synthetic_allperturbs/epsilon_value
+'''
 
 def dataset(mode, input_name, output_dir):
-    beta = 25 # used 40 earlier
+    beta = 25 
     number_of_clusters = CLUSTER_NUMBER
     if mode == 1:
         outputName = "%s/old/assign.out" % output_dir
@@ -25,16 +21,13 @@ def dataset(mode, input_name, output_dir):
 
 def runHyperParameterTests(inputName, outputDir, clusters, beta, oldAssignmentsName):
     gammas = [0.4, 0.6, 0.8, 0.99]
-    #gammas = [0.2, 0.3, 0.5]
-    #gammas = [0.8]
-    #gammas = [0.2, 0.3,  0.5,  0.7, 0.9]
     motifReqs = 10
     bics = []
     for g in gammas:
         gammaDir = "%s/%s/" % (outputDir, g)
         makeDir(gammaDir)
         _, bic = runTest(1, inputName, gammaDir, clusters,
-                beta, g, motifReqs, oldAssignmentsName, 10) # orig 10
+                beta, g, motifReqs, oldAssignmentsName, 10)
         bics.append(bic)
     print(bics)
 
@@ -67,7 +60,6 @@ def makeDir(dirname):
 
 def runTest(mode, inputName, outputDir, clusters, beta, gamma, motifReq, oldAssignmentsName, maxIters):
     print("TESTING %s" % (gamma))
-    #maxIters used to be 30
     solver = TICCSolver(window_size=1, number_of_clusters=clusters, lambda_parameter=1e-3, beta=beta, threshold=2e-5,
                         gamma=gamma, input_file=inputName, num_proc=10, maxMotifs=50, motifReq=motifReq, maxIters=maxIters)
     old_assign = None

@@ -6,6 +6,9 @@ import pickle
 import matplotlib.pyplot as plt
 from collections import Counter
 
+
+'''RUN  python3 analyze_synthetic_motifs.py ordered_synthetic_allperturbs/0.2/'''
+
 GAMMAS = ["0.2", "0.3", "0.4", "0.5", "0.6", "0.7", "0.8", "0.9", "0.99"]
 ONLY_PICK_BEST = False
 
