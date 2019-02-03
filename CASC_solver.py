@@ -8,7 +8,7 @@ from sklearn import mixture
 import time
 from multiprocessing import Pool
 from collections import deque
-from src.TICC_helper import *
+from src.CASC_helper import *
 from src.motif.find_motif import PerformAssignment
 from src.admm_solver import ADMMSolver
 #######################################################################################################################################################################
@@ -20,7 +20,7 @@ np.random.seed(103)  # 102
 logging.basicConfig(level=logging.DEBUG)
 
 
-class TICCSolver:
+class CASCSolver:
     def __init__(self, window_size=10, number_of_clusters=5, lambda_parameter=11e-2,
                  beta=400, maxIters=1000, threshold=2e-5,
                  input_file=None, num_proc=1, gamma=0.9, maxMotifs=None, motifReq=2):
@@ -55,17 +55,17 @@ class TICCSolver:
             self.pool.close()
             self.pool.join()
 
-    def PerformFullTICC(self, initialClusteredPoints=None, useMotif=False):
+    def PerformFullCASC(self, initialClusteredPoints=None, useMotif=False):
         train_cluster_inverse = motifs = motifsRanked = None
         clustered_points = initialClusteredPoints
         start = time.time()
         if clustered_points is None:
-            # perform no motif ticc
+            # perform no motif CASC
             initialClusteredPoints = self.getInitialClusteredPoints()
             clustered_points, train_cluster_inverse, _, _, bic = self.solveWithInitialization(
                 initialClusteredPoints, useMotif=False)
         if useMotif:
-            # perform secondary motif ticc if specified
+            # perform secondary motif CASC if specified
             clustered_points, train_cluster_inverse, motifs, motifsRanked, bic = self.solveWithInitialization(
                 clustered_points, useMotif=True)
         end = time.time()
@@ -233,7 +233,7 @@ class TICCSolver:
     def solveForClusters(self, clust_indices, cluster_mean_stacked_info,
                          empirical_covariances, train_cluster_inverse, computed_cov):
         '''
-        Find the characteristic clusters. Given clust_indices, fill out the results 
+        Find the characteristic clusters. Given clust_indices, fill out the results
         in the rest of the parameters
         '''
         K = self.K

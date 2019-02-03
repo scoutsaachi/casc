@@ -1,4 +1,4 @@
-from TICC_solver import TICCSolver
+from CASC_solver import CASCSolver
 import numpy as np
 import sys
 import pickle
@@ -30,14 +30,14 @@ def runBICTests(inputName, number_of_clusters):
     beta = [25, 40, 60, 100]
     bicBeta = []
     for b in beta:
-        _, bic = runNonMotifTICC(inputName, None, number_of_clusters, b, None)
+        _, bic = runNonMotifCASC(inputName, None, number_of_clusters, b, None)
         bicBeta.append((bic, b))
     bicBeta.sort(reverse=True)
     print(bicBeta)
 
 
-def runNonMotifTICC(inputName, outputDir, clusters, beta, oldAssignmentsName):
-    if outputDir is not None: 
+def runNonMotifCASC(inputName, outputDir, clusters, beta, oldAssignmentsName):
+    if outputDir is not None:
         oldDir = "%s/old/" % outputDir
         makeDir(oldDir)
         outputDir = oldDir
@@ -57,14 +57,14 @@ def runTest(mode, inputName, outputDir, clusters, beta, gamma, motifReq, oldAssi
     print("TESTING %s" % (gamma))
     #maxIters used to be 30
     print(oldAssignmentsName, inputName)
-    solver = TICCSolver(window_size=1, number_of_clusters=clusters, lambda_parameter=1e-3, beta=beta, threshold=2e-5,
+    solver = CASCSolver(window_size=1, number_of_clusters=clusters, lambda_parameter=1e-3, beta=beta, threshold=2e-5,
                         gamma=gamma, input_file=inputName, num_proc=30, maxMotifs=25, motifReq=motifReq, maxIters=maxIters)
     old_assign = None
     usemotif = False
     if mode == 1:
         old_assign = np.loadtxt(oldAssignmentsName, dtype=int)
         usemotif = True
-    (cluster_assignment, cluster_MRFs, motifs, motifRanked, bic, t) = solver.PerformFullTICC(
+    (cluster_assignment, cluster_MRFs, motifs, motifRanked, bic, t) = solver.PerformFullCASC(
         initialClusteredPoints=old_assign, useMotif=usemotif)
     solver.CleanUp()
     if usemotif and outputDir is not None:

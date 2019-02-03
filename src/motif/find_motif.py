@@ -17,7 +17,7 @@ def PerformAssignment(sequence, negLLMatrix, solver):
     -------
     sequence: the sequence of assignments outputted by TICC
     negLLMatrix: the negative log likelihood without any motifs
-    sovler: the TICC_solver calling this method
+    solver: the CASC_solver calling this method
 
     Returns
     -------
@@ -44,7 +44,7 @@ def PerformAssignment(sequence, negLLMatrix, solver):
     for i in range(nMotifsFound):
         worker_result = futures[i].get()
         instanceList += worker_result
-    instanceList.sort()    
+    instanceList.sort()
     final_assignment, motif_result = greedy_assignv2(sequence, instanceList, solver.motifReq)
     if np.all(final_assignment == sequence):
         print ("assignment not changed")
@@ -59,7 +59,7 @@ def computeFinalMotifScores(final_assignment, motif_result, numClusters):
         motif_scores.append((m, score))
     motif_scores.sort(reverse=True, key=lambda m:m[1])
     return motif_scores
-    
+
 
 def motifWorker(totLength, m, beta, gamma, negLLMatrix, garbageCol, betaGarbage, bigramProbs):
     instanceList = []
@@ -68,14 +68,14 @@ def motifWorker(totLength, m, beta, gamma, negLLMatrix, garbageCol, betaGarbage,
     score = MotifScore(totLength, bigramProbs, m, len(motifInstances))
     for motifIndices, neg_likelihood in motifInstances:
         logodds = computeLogOdds(m, motifIndices, garbageCol+np.log(gamma), negLLMatrix)
-        motifScore = logodds + score 
+        motifScore = logodds + score
         instanceList.append((-1*motifScore, tuple(m), motifIndices))
     return instanceList
 
 
 def getGarbageCol(sequence, negLLMatrix, beta, gamma):
     '''
-    return the garbage column and the times where the garbage 
+    return the garbage column and the times where the garbage
     column should be added by beta
     '''
     n = len(sequence)
@@ -106,7 +106,7 @@ def greedy_assignv2(sequence, instanceList, motifReq):
         nonlocal instanceList, locked, result, tentative, motifResult
         assert not isLocked(motifIDX)
         locked_vals.append(motifIDX)
-        
+
         _, motif, indices = instanceList[motifIDX]
         oldSet = motifResult[motif].copy()
         gap = (indices[0], indices[-1])
@@ -133,7 +133,7 @@ def greedy_assignv2(sequence, instanceList, motifReq):
         motifResult[motif].add(motifIDX)
         for i in range(gap[0], gap[1]+1): # make ourselves tentative
             tentative[i].add(motifIDX)
-    
+
     def isLocked(idx):
         nonlocal instanceList, locked
         _, _, indices = instanceList[idx]
@@ -192,7 +192,7 @@ def replaceModules(in_motif, candidateModules):
     return motif
 
 def replaceRedundancy(motif, submotif, module):
-    ''' given a motif, a sub-pattern, and the subpattern module, replace 
+    ''' given a motif, a sub-pattern, and the subpattern module, replace
         all instances of submotif with module. edits in place'''
     matches = []
     i = 0
@@ -232,7 +232,7 @@ def find_motifs(sequence, motifReqs, maxMotifs):
     totLength = len(collapsed)
     motif_results = GetMotifs(collapsed)  # [(motif length), [<start_indices>]]
     motif_results.sort(key=lambda mr: mr[0]) # sort so that the shortest is first
-    
+
     # split the results into 2 motif and >2 motif results
     splitPoint = -1
     for i in range(len(motif_results)):
@@ -264,7 +264,7 @@ def find_motifs(sequence, motifReqs, maxMotifs):
         pscore = 1-poisson.cdf(numIncidences, totLength*np.exp(log_prob_ind))
         if pscore < alpha: # significant
             #print("----")
-            #print([(stage, np.exp(logFreqProbs[stage])) for stage in motifReplaced])           
+            #print([(stage, np.exp(logFreqProbs[stage])) for stage in motifReplaced])
             print(moduleCount, motif, motifReplaced, pscore, numIncidences, np.exp(log_prob_ind)*totLength,  np.exp(log_prob_ind), totLength)
 #             motifIncidenceLengths = inflateMotifLengths(incidences, orig_indices, len(motif))
 #             candidates.append((motif, motifIncidenceLengths))
@@ -318,13 +318,13 @@ def computeMotifBigramProbs(bigramProbs, motif):
             probs += bigramProbs[prev, val]
         prev = val
     return probs
-    
+
 
 def MotifScore(totLength, bigramProbs, motif, numIncidences):
     '''
         perform motif score: G-test
         return a score.
-        TODO: see whether we want a bigram or unigram model 
+        TODO: see whether we want a bigram or unigram model
     '''
     #null_probs = computeMotifBigramProbs(bigramProbs, motif)
     #log_E = np.log(totLength) + null_probs
@@ -424,7 +424,7 @@ def inflateMotifLengths(collapsedStartIndices, orig_indices, length):
     of length K
 
     If the collapsed motif is length K, and there are N incidences of the motif,
-    return a N x K matrix A where A[i,j] is the length of the jth motif segment 
+    return a N x K matrix A where A[i,j] is the length of the jth motif segment
     in incidence i
     '''
     N = len(collapsedStartIndices)

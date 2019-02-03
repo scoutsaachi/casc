@@ -29,7 +29,7 @@ def loadAndPlotScores(directory):
         "Weighted Macro F1 Score on All Clusters",
         "Accuracy Score on Motif Segments"]
     for i in range(0,1):
-        plt.figure(i, figsize=(7, 4))
+        plt.figure(i, figsize=(7, 3))
         plt.plot(labels, scoreValues[i], "-bs", label="CASC")
         ticcLine = [ticcscores[i] for _ in range(len(labels))]
         plt.plot(labels, ticcLine, "--", label="TICC", color="orange")
